@@ -24,16 +24,21 @@ export const register = async (req, res) => {
             { expiresIn: age }
         );
 
-        res.status(201).json({  
-            message: "User Registered Successfully",
-            user: { 
-                id: newUser.id, 
-                email: newUser.email, 
-                phonenumber: newUser.phonenumber
-            },
-            token
-        });
-
+        res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: age
+    }).status(201).json({
+      message: "User Registered Successfully",
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        phonenumber: newUser.phonenumber
+      },
+      token
+    });
+    
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Failed to create user!" });
@@ -64,6 +69,8 @@ export const login = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
+             secure: true,        
+      sameSite: "None",
             maxAge: age
         }).status(200).json({  
             message: "Login Successful",
@@ -82,5 +89,9 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.clearCookie("token").status(200).json({ message: "Logout Successful" });
+   res.clearCookie("token", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None"
+}).status(200).json({ message: "Logout Successful" });
 };
